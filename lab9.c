@@ -84,6 +84,7 @@ void printRecords(struct RecordType pData[], int dataSz)
 void displayRecordsInHash(struct HashType *pHashArray, int hashSz)
 {
 	int i;
+	printf("Records in hash table:\n");
 
 	for (i=0;i<hashSz;++i)
 	{
