@@ -1,23 +1,31 @@
 #include <stdio.h>
 
+# define TABLESIZE 200
+
 // RecordType
-struct RecordType
+typedef struct RecordType
 {
 	int		id;
 	char	name;
 	int		order; 
-};
+} record;
 
 // Fill out this structure
-struct HashType
+typedef struct HashType
 {
+	struct node** lists;
+	int size;
+} hashtable;
 
-};
+typedef struct node {
+	record* rPtr;
+	struct node* next;
+} node;
 
 // Compute the hash function
 int hash(int x)
 {
-
+	return ((x-1)/2) % TABLESIZE;
 }
 
 // parses input file to an integer array
@@ -80,7 +88,22 @@ void displayRecordsInHash(struct HashType *pHashArray, int hashSz)
 	for (i=0;i<hashSz;++i)
 	{
 		// if index is occupied with any records, print all
+		printLinkedList(pHashArray->lists[i]);
 	}
+	free(pHashArray->lists);
+	free(pHashArray);
+}
+
+void printLinkedList(node* head) {
+	if (head == NULL)
+		return;
+	
+	if (head->next != NULL)
+		printLinkedList(head->next);
+	
+	printf("\t%d %c %d\n", head->rPtr->id, head->rPtr->name, head->rPtr->order);
+	free(head->rPtr);
+	free(head);
 }
 
 int main(void)
@@ -91,4 +114,26 @@ int main(void)
 	recordSz = parseData("input.txt", &pRecords);
 	printRecords(pRecords, recordSz);
 	// Your hash implementation
+	hashtable* h = (hashtable*) malloc(sizeof(hashtable));
+	h->lists = (node*) malloc(sizeof(node*)*TABLESIZE);
+	h->size = TABLESIZE;
+	for (int x = 0; x < h->size; x++)
+		h->lists[x] = NULL;
+
+	for (int y = 0; y < recordSz; y++) {
+		//printf("%d\n", hash(pRecords[y].id));
+		int row = hash(pRecords[y].id);
+		node* head = h->lists[row];
+		node* entry = (node*) malloc(sizeof(node));
+		entry->rPtr = (record*) malloc(sizeof(record));
+		record* rPtr = entry->rPtr;
+		rPtr->id = pRecords[y].id;
+		rPtr->name = pRecords[y].name;
+		rPtr->order = pRecords[y].order;
+		entry->next = head;
+		h->lists[row] = entry;
+	}
+
+	displayRecordsInHash(h, h->size);
+
 }
