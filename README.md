@@ -1,1 +1,1 @@
-Build: gcc lab9.c input.txt
+Build: gcc lab9.c
